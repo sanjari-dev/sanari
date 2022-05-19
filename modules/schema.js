@@ -29,20 +29,6 @@ export default class Schema
     return ls;
   }
 
-  body(data)
-  {
-    const _body = Object.create({});
-    const keys_data = Object.keys(this.#_data);
-    keys_data.shift();
-    for (let i = 0; i < keys_data.length; i++) {
-      _body[keys_data[i]] = this.#_data[keys_data[i]];
-      if (data) {
-        _body[keys_data[i]] = data[keys_data[i]];
-      }
-    }
-    return _body;
-  }
-
   /**
    * @param {{}} args
    */

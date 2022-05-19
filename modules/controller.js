@@ -43,6 +43,7 @@ export default class Controller
       middleware.push(_.middleware.sanari.default);
       if (arguments.length === 2) {
         middleware.pop();
+        middleware.push(_.middleware.headers.token);
         middleware.push(_.middleware.sanari.store(...arguments));
       }
       return _.helpers.middleware.run(middleware, next);

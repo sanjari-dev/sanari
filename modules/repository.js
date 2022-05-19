@@ -7,7 +7,7 @@ export default class Repository
   constructor()
   {}
 
-  async all(query, option = {}, include = [])
+  async all(query, option = {}, include = [], scope = "")
   {
     const sequelize = db[Object.keys(db)[0]].Sequelize;
     option.include = include;
@@ -32,16 +32,33 @@ export default class Repository
         }
       }
     }
-    const data = await this.#_model.findAll(option);
+    let data = {};
+    try {
+      data = await this.#_model.scope(scope).findAll(option);
+    }
+    catch (err) {
+      data = await this.#_model.findAll(option);
+    }
     return data;
   }
 
-  async add(body, schema)
+  async add(body, user)
   {
-    const sequelize = db[Object.keys(db)[0]].Sequelize;
-    const _body = schema.body(body);
+    // last
+    const last = await this.#_model.findOne({
+      order: [
+        ['id', 'DESC']
+      ],
+      paranoid: false
+    });
+
+    // set id
+    body.id = last ? last.id + 1 : 1;
+    body.createdBy = user.id;
+    body.updatedBy = user.id;
     
-    return _body;
+    // create body
+    return await this.#_model.create(body);
   }
 
   /**

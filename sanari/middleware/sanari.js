@@ -1,3 +1,4 @@
+import searchBuilder from "sequelize-search-builder";
 
 export default class M_Sanari
 {
@@ -31,16 +32,19 @@ export default class M_Sanari
       const response = sans.helpers.response;
       try {
         let data = {};
+        let message = sans.helpers.sanari.sayHello("Sanari");
         if (repository) {
-          data = await repository.all(req.query);
+          data = await repository.all(req.query, {}, [], "index");
+          message = repository.constructor.name.toLowerCase();
           if (schema.index) {
             data = schema.index.list(data);
+            message = schema.index.constructor.name.toLowerCase();
           }
         }
         return response
           .success(
             data, 
-            sans.helpers.sanari.sayHello("Sanari")
+            message
           );
       }
       // handle error code
@@ -56,16 +60,19 @@ export default class M_Sanari
       const response = sans.helpers.response;
       try {
         let data = {};
-        if (repository && schema.store?.adder) {
-          data = await repository.add(req.body, schema.store?.adder);
-          if (schema.store?.show) {
-            data = schema.store?.show.get(data);
+        let message = sans.helpers.sanari.sayHello("Sanari");
+        if (repository) {
+          data = await repository.add(req.body, req.user);
+          message = repository.constructor.name.toLowerCase();
+          if (schema.store) {
+            data = schema.store.get(data);
+            message = schema.store.constructor.name.toLowerCase();
           }
         }
         return response
           .success(
             data,
-            sans.helpers.sanari.sayHello("Sanari")
+            message
           );
       }
       // handle error code
